@@ -1,3 +1,8 @@
+# in the name of God
+
+# python3 server.py
+# python3 client.py HTTP www.google.com
+
 from client import Client
 import sys
 
