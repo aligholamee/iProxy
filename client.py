@@ -1,12 +1,11 @@
 # in the name of God
-
 import socket
-
 
 class Client:
     msg = ""
     UDP_IP = "127.0.0.1"
     UDP_PORT = 50505
+    ack = false
 
     def __init__(self, protocol, dest_address):
         self.protocol = protocol
@@ -26,4 +25,6 @@ class Client:
         self.make_http_message()
         self.msg = str.replace(self.msg, '\n', '\r\n\r\n')
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.sendto(self.msg.encode(), (self.UDP_IP, self.UDP_PORT))
+
+    def getAck()
+        return ack;

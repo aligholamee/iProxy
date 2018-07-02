@@ -8,10 +8,10 @@ rcv_sock.bind((UDP_IP, UDP_PORT))
 print("Serving...")
 data, addr = rcv_sock.recvfrom(2048)
 data = data.decode()
-site_address = data.split(":")[1].strip(' ').strip('\n');
+site_address = data.split(":")[1].strip(' ').strip('\r\n');
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(("www.google.com", 80))
+s.connect((site_address, 80))
 print(data)
 print(site_address)
 
@@ -22,5 +22,7 @@ while True:
     f = s.makefile('rb')
     data = f.read(1024)           # or any other file method call you need
 
-print("rcv google is ", data)
+    
+
+
 
