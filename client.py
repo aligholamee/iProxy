@@ -24,5 +24,6 @@ class Client:
 
     def send_http_message(self):
         self.make_http_message()
+        self.msg = str.replace(self.msg, '\n', '\r\n\r\n')
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.sendto(self.msg.encode(), (self.UDP_IP, self.UDP_PORT))
