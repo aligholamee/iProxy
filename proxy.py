@@ -7,7 +7,7 @@ client_proxy_socket.bind((PROXY_UDP_IP, PROXY_UDP_PORT))
 http_request, addr = client_proxy_socket.recvfrom(MAX_BUFFER_SIZE)
 http_request = http_request.decode()
 
-site_address = http_request.split(":")[1].strip(' ').strip('\r\n');
+site_address = http_request.split(":")[1].strip(' ').strip('\r\n')
 
 proxy_destination_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 proxy_destination_socket.connect((site_address, 80))
