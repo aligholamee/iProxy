@@ -15,7 +15,7 @@ class Client:
     def make_http_message(self, dest_address):
         dest_host = dest_address.split('/')[0]
         dest_path = "/" + dest_address.split('/')[1]
-        self.msg += "GET " + dest_path + " HTTP/1.1\n"
+        self.msg += "GET " + dest_path + " HTTP/1.1\n\n"
         self.set_header("Host", dest_host)
 
     def send_http_message(self, dest_address):
@@ -30,6 +30,7 @@ class Client:
         proxy_client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         proxy_client_socket.bind((CLIENT_UDP_IP, CLIENT_UDP_PORT))
         http_response, addr = proxy_client_socket.recvfrom(MAX_BUFFER_SIZE)
+        print(http_response)
 
     def make_dns_query(self, type, dns_server, dest_address):
         dest_host = dest_address.split('/')[0]
@@ -40,7 +41,7 @@ class Client:
 
     def send_dns_query(self, type, dns_server, dest_address):
         self.make_dns_query(type, dns_server, dest_address)
-        self.msg = str.replace(self.msg, '\n', '\r\n\r\n')
+        self.msg = str.replace(self.msg, '\n', '\r\n')
         client_proxy_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_proxy_socket.connect((PROXY_TCP_IP, PROXY_TCP_PORT))
         print('self dns query' , self.msg)

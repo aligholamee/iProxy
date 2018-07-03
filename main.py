@@ -1,6 +1,6 @@
 # in the name of God
 
-# python3 client.py http www.google.com
+# python3 main.py http www.google.com
 # python3 main.py dns A 1.1.1.1 aut.ac.ir
 
 from client import Client

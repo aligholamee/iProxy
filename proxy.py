@@ -1,6 +1,7 @@
 import socket
 from config import *
 from util import Util
+import dns.resolver
 import sys
 
 
@@ -42,8 +43,10 @@ class Proxy():
         proxy_destination_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         proxy_destination_socket.sendto(dns_query.encode(), (dns_server, 53))
         dns_response, addr = proxy_destination_socket.recvfrom(MAX_BUFFER_SIZE)
-
-        print(dns_response)
+        myResolver = dns.resolver.Resolver() #create a new instance named 'myResolver'
+        myAnswers = myResolver.query(dns_server, "A") #Lookup the 'A' record(s) for google.com
+        for rdata in myAnswers: #for each response
+            print(rdata) #print the data
 
     def listen(self):
         if self.protocol == 'dns':
