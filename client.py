@@ -49,6 +49,11 @@ class Client:
         self.set_dns_header("Type", 'A')
         self.set_dns_header("Class", 'IN')
 
-
+    def send_dns_query(self):
+        self.make_dns_query()
+        self.dns_query = str.replace(self.dns_query, '\n', '\r\n\r\n')
+        client_proxy_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_proxy_socket.connect(PROXY_TCP_IP, PROXY_TCP_PORT)
+        client_proxy_socket.sendall(self.dns_query.encode())
 
         
