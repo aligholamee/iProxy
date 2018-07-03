@@ -1,9 +1,11 @@
 import socket
 from config import *
+from util import Util
 import sys
 
 
 class Proxy():
+
     def __init__(self, protocol):
         self.protocol = protocol
 
@@ -33,17 +35,21 @@ class Proxy():
         server_socket.listen(20000)
         client_proxy_socket, addr = server_socket.accept()
         raw_message = client_proxy_socket.recv(MAX_BUFFER_SIZE).decode()
-        print('x' + raw_message)
         dns_query = '\r\n'.join(raw_message.split('\r\n')[1:])
-        dns_server = raw_message.split(':')[0]
-        print(dns_query, dns_server)
+        dns_server = raw_message.split(':')[0].strip('\r\n')
+        print(dns_query)
+        print(dns_server)
+        proxy_destination_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        proxy_destination_socket.sendto(dns_query.encode(), (dns_server, 53))
+        dns_response, addr = proxy_destination_socket.recvfrom(MAX_BUFFER_SIZE)
+
+        print(dns_response)
 
     def listen(self):
         if self.protocol == 'dns':
             self.listen_for_dns()
         if self.protocol == 'http':
             self.listen_for_http()
-
 
 if __name__ == '__main__':
     proxy = Proxy(sys.argv[1])
