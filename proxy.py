@@ -38,11 +38,11 @@ class Proxy():
         raw_message = client_proxy_socket.recv(MAX_BUFFER_SIZE).decode()
         dns_query = '\r\n'.join(raw_message.split('\r\n')[1:])
         dns_server = raw_message.split(':')[0].strip('\r\n')
-        print(dns_query)
-        print(dns_server)
-        proxy_destination_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        proxy_destination_socket.sendto(dns_query.encode(), (dns_server, 53))
-        dns_response, addr = proxy_destination_socket.recvfrom(MAX_BUFFER_SIZE)
+        # print(dns_query)
+        # print(dns_server)
+        # proxy_destination_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # proxy_destination_socket.sendto(dns_query.encode(), (dns_server, 53))
+        # dns_response, addr = proxy_destination_socket.recvfrom(MAX_BUFFER_SIZE)
         myResolver = dns.resolver.Resolver() #create a new instance named 'myResolver'
         myAnswers = myResolver.query(dns_server, "A") #Lookup the 'A' record(s) for google.com
         for rdata in myAnswers: #for each response
