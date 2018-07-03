@@ -6,9 +6,11 @@
 from client import Client
 import sys
 
+clnt = Client()
+if sys.argv[1] == 'http':
+    clnt.send_http_message(sys.argv[2])
 
-print(sys.argv[1])
-clnt = Client(sys.argv[1] , sys.argv[2])
-clnt.send_http_message()
+if sys.argv[1] == 'dns':
+    clnt.send_dns_query(sys.argv[2] , sys.argv[3])
 
 
