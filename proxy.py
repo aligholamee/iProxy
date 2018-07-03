@@ -1,6 +1,7 @@
 import socket
 from config import *
 
+
 class Proxy:
     def __init__(self):
         pass
@@ -14,15 +15,16 @@ class Proxy:
 
         site_address = http_request.split(":")[1].strip(' ').strip('\r\n')
 
-        proxy_destination_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        proxy_destination_socket = socket.socket(
+            socket.AF_INET, socket.SOCK_STREAM)
         proxy_destination_socket.connect((site_address, 80))
         proxy_destination_socket.sendall(http_request.encode())
         print(site_address)
         http_response = proxy_destination_socket.recv(MAX_BUFFER_SIZE)
         print(http_response)
         proxy_client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        proxy_client_socket.sendto(http_response, (CLIENT_UDP_IP, CLIENT_UDP_PORT))
-
+        proxy_client_socket.sendto(
+            http_response, (CLIENT_UDP_IP, CLIENT_UDP_PORT))
 
     def listen_for_dns():
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -31,11 +33,3 @@ class Proxy:
         client_proxy_socket, addr = server_socket.accept()
 
         dns_query = client_proxy_socket.recv(MAX_BUFFER_SIZE)
-        
-
-
-
-
-
-
-
