@@ -12,4 +12,4 @@ class Util:
             sock.sendto(data, (ip, port))
             time.sleep(5)
             if master.getAck() == True:
-                break;
+                break
