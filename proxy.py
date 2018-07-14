@@ -2,6 +2,10 @@ import socket
 from config import *
 from util import Util
 import dns.resolver
+import dns.message
+import dns.rdataclass
+import dns.rdatatype
+import dns.query
 import sys
 
 
@@ -38,15 +42,17 @@ class Proxy():
         raw_message = client_proxy_socket.recv(MAX_BUFFER_SIZE).decode()
         dns_query = '\r\n'.join(raw_message.split('\r\n')[1:])
         dns_server = raw_message.split(':')[0].strip('\r\n')
-        # print(dns_query)
-        # print(dns_server)
-        # proxy_destination_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # proxy_destination_socket.sendto(dns_query.encode(), (dns_server, 53))
-        # dns_response, addr = proxy_destination_socket.recvfrom(MAX_BUFFER_SIZE)
-        myResolver = dns.resolver.Resolver() #create a new instance named 'myResolver'
-        myAnswers = myResolver.query(dns_server, "A") #Lookup the 'A' record(s) for google.com
-        for rdata in myAnswers: #for each response
-            print(rdata) #print the data
+
+        dns_response = ""
+        myResolver = dns.resolver.Resolver()
+        myResolver.nameservers = [dns_server]
+        myAnswers = myResolver.query("blog.ir", "A")
+        for rdata in myAnswers:
+            dns_response += str(rdata) + '\n'
+        print(dns_response)
+        proxy_client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        proxy_client_socket.connect((CLIENT_TCP_IP , CLIENT_TCP_PORT))
+        proxy_client_socket.send(dns_response.encode())
 
     def listen(self):
         if self.protocol == 'dns':

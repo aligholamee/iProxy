@@ -26,7 +26,7 @@ class Client:
             self.msg.encode(), (PROXY_UDP_IP, PROXY_UDP_PORT))
         self.wait_for_response()
 
-    def wait_for_response(self):
+    def wait_for_http_response(self):
         proxy_client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         proxy_client_socket.bind((CLIENT_UDP_IP, CLIENT_UDP_PORT))
         http_response, addr = proxy_client_socket.recvfrom(MAX_BUFFER_SIZE)
@@ -46,3 +46,12 @@ class Client:
         client_proxy_socket.connect((PROXY_TCP_IP, PROXY_TCP_PORT))
         print('self dns query' , self.msg)
         client_proxy_socket.send(self.msg.encode())
+        self.wait_for_dns_response()
+
+    def wait_for_dns_response(self):
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.bind((CLIENT_TCP_IP, CLIENT_TCP_PORT))
+        server_socket.listen(20000)
+        proxy_client_socket, addr = server_socket.accept()
+        dns_response = proxy_client_socket.recv(MAX_BUFFER_SIZE)
+        print(dns_response.decode())
