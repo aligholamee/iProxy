@@ -23,7 +23,7 @@ class Proxy():
         site_address = site_address.decode()
         print(site_address)
 
-        http_response = requests.head(site_address, timeout=30)
+        http_response = requests.get(site_address, timeout=30)
         print(http_response)
         print(http_response.text)
         proxy_client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
