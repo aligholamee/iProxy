@@ -1,6 +1,7 @@
 # in the name of God
 import socket
 from config import *
+from rdt import *
 
 
 class Client:
@@ -12,11 +13,12 @@ class Client:
     def set_header(self, header, value):
         self.msg += header + ': ' + value + '\n'
 
-
     def send_http_message(self, dest_address):
         client_proxy_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        client_proxy_socket.sendto(
-            dest_address.encode(), (PROXY_UDP_IP, PROXY_UDP_PORT))
+        rdt_send(client_proxy_socket, dest_address.encode(), PROXY_UDP_IP, PROXY_UDP_PORT)
+        
+        # client_proxy_socket.sendto(
+        #     dest_address.encode(), (PROXY_UDP_IP, PROXY_UDP_PORT))
         self.wait_for_http_response()
 
     def wait_for_http_response(self):
