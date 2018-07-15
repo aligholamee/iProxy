@@ -1,7 +1,8 @@
 # in the name of God
 
-# python3 main.py http www.google.com
+# python3 main.py http www.google.com/
 # python3 main.py dns A 1.1.1.1 aut.ac.ir
+# python3 proxy.py http
 
 from client import Client
 import sys

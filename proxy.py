@@ -8,6 +8,7 @@ import dns.rdataclass
 import dns.rdatatype
 import dns.query
 import sys
+from rdt import *
 
 
 class Proxy():
@@ -16,19 +17,14 @@ class Proxy():
         self.protocol = protocol
 
     def listen_for_http(self):
-        client_proxy_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        client_proxy_socket.bind((PROXY_UDP_IP, PROXY_UDP_PORT))
 
-        site_address, addr = client_proxy_socket.recvfrom(MAX_BUFFER_SIZE)
-        site_address = site_address.decode()
+        site_address = rdt_receive(PROXY_UDP_IP, PROXY_UDP_PORT, CLIENT_UDP_IP, CLIENT_UDP_PORT)
         print(site_address)
 
         http_response = requests.get(site_address, timeout=30)
         print(http_response)
         print(http_response.text)
-        proxy_client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        proxy_client_socket.sendto(
-            http_response.text.encode(), (CLIENT_UDP_IP, CLIENT_UDP_PORT))
+        rdt_send(http_response.text.encode(), PROXY_UDP_IP, PROXY_UDP_PORT, CLIENT_UDP_IP, CLIENT_UDP_PORT)
 
     def send_dns_query(self, dns_server, domain_name, query_type):
         dns_response = ""
