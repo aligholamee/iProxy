@@ -1,6 +1,4 @@
 import socket
-from config import *
-from util import Util
 import requests
 import dns.resolver
 import dns.message
@@ -8,7 +6,10 @@ import dns.rdataclass
 import dns.rdatatype
 import dns.query
 import sys
+from util import Util
+from config import *
 from rdt import *
+from cache import Cache
 
 
 class Proxy():
@@ -21,7 +22,16 @@ class Proxy():
         site_address = rdt_receive(PROXY_UDP_IP, PROXY_UDP_PORT, CLIENT_UDP_IP, CLIENT_UDP_PORT)
         print(site_address)
 
-        http_response = requests.get(site_address, timeout=30)
+        # Caching / Decaching mechanism
+        http_cache = Cache('http')
+        cache_status, http_response = http_cache.lookup(site_address)
+
+        if(cache_status == CACHE_HIT):
+            pass
+        else:
+            http_response = requests.get(site_address, timeout=30)
+            http_cache.store(site_address, http_response)
+
         print(http_response)
         print(http_response.text)
         rdt_send(http_response.text.encode(), PROXY_UDP_IP, PROXY_UDP_PORT, CLIENT_UDP_IP, CLIENT_UDP_PORT)
@@ -48,11 +58,18 @@ class Proxy():
         query_type = dns_query[1].strip('\r\n')
         domain_name = dns_query[2].strip('\r\n')
 
-        dns_response = ''
-        if query_type == 'A' or query_type == 'CNAME':
-            dns_response = self.send_dns_query(dns_server, domain_name, query_type)
+        # Caching / Decaching mechanism
+        dns_cache = Cache('dns')
+        cache_status, dns_response = dns_cache.lookup(domain_name)
+        if(cache_status == CACHE_HIT):
+            pass
         else:
-            raise ('Query Type not supported')
+            dns_response = ''
+            if query_type == 'A' or query_type == 'CNAME':
+                dns_response = self.send_dns_query(dns_server, domain_name, query_type)
+                dns_cache.store(domain_name, dns_response)
+            else:
+                raise ('Query Type not supported')
 
         proxy_client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         proxy_client_socket.connect((CLIENT_TCP_IP, CLIENT_TCP_PORT))
