@@ -32,10 +32,10 @@ class Cache:
             request: data
         }
 
-        # Append to directory
+        # Append to cache dictionary
         self.cache_directory = {**self.cache_directory, **cached_data}
 
-        # Append to cache
+        # Append to cache json
         cache_file = self.CONNECTION_PROTOCOL + '_cache.json'
         with open(cache_file, 'w') as cache_directory:
             json.dump(self.cache_directory, cache_directory)
