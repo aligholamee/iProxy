@@ -27,7 +27,7 @@ class Proxy():
         cache_status, http_response = http_cache.lookup(site_address)
 
         if(cache_status == CACHE_HIT):
-            pass
+            print("\nHTTP Cache Hit!")
         else:
             http_response = requests.get(site_address, timeout=30)
             http_cache.store(site_address, http_response)
@@ -62,7 +62,7 @@ class Proxy():
         dns_cache = Cache('dns')
         cache_status, dns_response = dns_cache.lookup(domain_name)
         if(cache_status == CACHE_HIT):
-            pass
+            print("\nDNS Cache Hit!")
         else:
             dns_response = ''
             if query_type == 'A' or query_type == 'CNAME':
