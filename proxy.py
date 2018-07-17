@@ -1,4 +1,6 @@
 import socket
+
+import re
 import requests
 import dns.resolver
 import dns.message
@@ -26,21 +28,40 @@ class Proxy():
         http_cache = Cache('http')
         cache_status, http_response = http_cache.lookup(site_address)
 
-        if(cache_status == CACHE_HIT):
+        if cache_status == CACHE_HIT:
             print("\nHTTP Cache Hit!")
+            rdt_send(http_response.encode(), PROXY_UDP_IP, PROXY_UDP_PORT, CLIENT_UDP_IP, CLIENT_UDP_PORT)
         else:
             http_response = requests.get(site_address, timeout=30)
-            http_cache.store(site_address, http_response)
+            http_cache.store(site_address, http_response.text)
+            print(http_response.text)
 
-        print(http_response)
-        print(http_response.text)
-        rdt_send(http_response.text.encode(), PROXY_UDP_IP, PROXY_UDP_PORT, CLIENT_UDP_IP, CLIENT_UDP_PORT)
+            if http_response.status_code == 200:
+                print('\n200 ok')
+                rdt_send(http_response.text.encode(), PROXY_UDP_IP, PROXY_UDP_PORT, CLIENT_UDP_IP, CLIENT_UDP_PORT)
+
+            elif http_response.status_code == 404:
+                print('\n404 not found')
+                rdt_send(b'404notfound', PROXY_UDP_IP, PROXY_UDP_PORT, CLIENT_UDP_IP, CLIENT_UDP_PORT)
+
+            elif http_response.status_code // 100 == 3:
+                print('\nmove temporary')
+
+            else:
+                raise ('unhandled return status code')
 
     def send_dns_query(self, dns_server, domain_name, query_type):
         dns_response = ""
         myResolver = dns.resolver.Resolver()
         myResolver.nameservers = [dns_server]
-        myAnswers = myResolver.query(domain_name, query_type)
+        try:
+            myAnswers = myResolver.query(domain_name, query_type)
+        except :
+            myAnswers = myResolver.query(domain_name, query_type)
+
+        print(myAnswers.response)
+        print(myAnswers.response.authority , myAnswers.response.flags)
+
         for rdata in myAnswers:
             dns_response += str(rdata) + '\n'
         return dns_response
@@ -60,17 +81,20 @@ class Proxy():
 
         # Caching / Decaching mechanism
         dns_cache = Cache('dns')
-        cache_status, dns_response = dns_cache.lookup(domain_name)
-        if(cache_status == CACHE_HIT):
+        cache_status, dns_response = dns_cache.lookup(query_type + domain_name)
+        if (cache_status == CACHE_HIT):
             print("\nDNS Cache Hit!")
         else:
             dns_response = ''
             if query_type == 'A' or query_type == 'CNAME':
-                dns_response = self.send_dns_query(dns_server, domain_name, query_type)
-                dns_cache.store(domain_name, dns_response)
+                try:
+                    dns_response = self.send_dns_query(dns_server, domain_name, query_type)
+                    dns_cache.store(query_type + domain_name, dns_response)
+                except socket.timeout:
+                    dns_response = self.send_dns_query(dns_server, domain_name, query_type)
             else:
                 raise ('Query Type not supported')
-
+        print(dns_response)
         proxy_client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         proxy_client_socket.connect((CLIENT_TCP_IP, CLIENT_TCP_PORT))
         proxy_client_socket.send(dns_response.encode())

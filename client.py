@@ -19,7 +19,11 @@ class Client:
         self.wait_for_http_response()
 
     def wait_for_http_response(self):
-        Util.write_into_file('result.html', rdt_receive(CLIENT_UDP_IP, CLIENT_UDP_PORT, PROXY_UDP_IP, PROXY_UDP_PORT))
+        http_response = rdt_receive(CLIENT_UDP_IP, CLIENT_UDP_PORT, PROXY_UDP_IP, PROXY_UDP_PORT)
+        if http_response == '404notfound':
+            raise('404 not found')
+        else:
+            Util.write_into_file('result.html', http_response)
 
     def make_dns_query(self, type, dns_server, dest_address):
         dest_host = dest_address.split('/')[0]
