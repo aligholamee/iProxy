@@ -13,3 +13,6 @@ OVERHEAD_BYTES = 3
 
 CACHE_HIT = 1
 CACHE_MISS = 0
+
+IS_AUTHORITATIVE = '\nAuthoritative response'
+NOT_AUTHORITATIVE = '\nUnauthoritative response'

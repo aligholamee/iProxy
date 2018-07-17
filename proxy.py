@@ -59,12 +59,16 @@ class Proxy():
         except :
             myAnswers = myResolver.query(domain_name, query_type)
 
-        print(myAnswers.response)
-        print(myAnswers.response.authority , myAnswers.response.flags)
+        is_auth = NOT_AUTHORITATIVE
+
+        if( myAnswers.response.flags & dns.flags.AA):
+            is_aut = IS_AUTHORITATIVE
+            print("Authoritative reponse!")
+
 
         for rdata in myAnswers:
             dns_response += str(rdata) + '\n'
-        return dns_response
+        return dns_response + is_auth
 
     def listen_for_dns(self):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -81,7 +85,7 @@ class Proxy():
 
         # Caching / Decaching mechanism
         dns_cache = Cache('dns')
-        cache_status, dns_response = dns_cache.lookup(query_type + domain_name)
+        cache_status, dns_response = dns_cache.lookup(domain_name + query_type + dns_server)
         if (cache_status == CACHE_HIT):
             print("\nDNS Cache Hit!")
         else:
@@ -89,7 +93,7 @@ class Proxy():
             if query_type == 'A' or query_type == 'CNAME':
                 try:
                     dns_response = self.send_dns_query(dns_server, domain_name, query_type)
-                    dns_cache.store(query_type + domain_name, dns_response)
+                    dns_cache.store(domain_name + query_type + dns_server, dns_response)
                 except socket.timeout:
                     dns_response = self.send_dns_query(dns_server, domain_name, query_type)
             else:
